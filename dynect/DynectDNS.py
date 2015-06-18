@@ -17,6 +17,7 @@ except ImportError:
         sys.exit("Could not find json or simplejson libraries.")
         
 if sys.version_info[0] == 2:
+
     from httplib import HTTPConnection, HTTPSConnection
     from urllib import pathname2url
 
@@ -48,7 +49,7 @@ class DynectRest(object):
     """
 
     def __init__(
-        self, host='api.dynect.net', port=443, ssl=True, api_version="current"
+        self, host='api.dynect.net', port=443, ssl=True, api_version="current", proxy_host=None, proxy_port=None
     ):
         """
         Basic initializer method
@@ -77,12 +78,55 @@ class DynectRest(object):
 
         self._valid_methods = set(('DELETE', 'GET', 'POST', 'PUT'))
 
+        # Add support for proxy connections
+        self.proxy_host = proxy_host
+        self.proxy_port = proxy_port
+        self.use_proxy = False
+        self.proxied_root = None
+
+        if proxy_host is not None and proxy_port is not None:
+            self.use_proxy = True
+            scheme = 'https' if self.ssl else 'http'
+            self.proxied_root = "{}://{}".format(scheme, self.host)
+
     def _debug(self, msg):
         """
         Debug output.
         """
         if self.verbose:
             sys.stderr.write(msg)
+
+    def _connect(self):
+        if self.ssl:
+            msg = "Establishing SSL connection to %s:%s\n" % (
+                self.host, self.port
+            )
+            self._debug(msg)
+            self._conn = HTTPSConnection(self.host, self.port)
+
+        else:
+            msg = "Establishing unencrypted connection to %s:%s\n" % (
+                self.host, self.port
+            )
+            self._debug(msg)
+            self._conn = HTTPConnection(self.host, self.port)
+
+    def _proxy_connect(self):
+        if self.ssl:
+            msg = "Establishing SSL connection to %s:%s\n" % (
+                self.host, self.port
+            )
+            self._debug(msg)
+            self._conn = HTTPSConnection(self.proxy_host, self.proxy_port)
+
+        else:
+            msg = "Establishing SSL connection to %s:%s\n" % (
+              self.proxy_host, self.proxy_port
+            )
+            self._debug(msg)
+            self._conn = HTTPConnection(self.proxy_host, self.proxy_port)
+
+        self._conn.set_tunnel(self.host, self.port)
 
     def connect(self):
         """
@@ -102,19 +146,10 @@ class DynectRest(object):
 
         self._conn = None
 
-        if self.ssl:
-            msg = "Establishing SSL connection to %s:%s\n" % (
-                self.host, self.port
-            )
-            self._debug(msg)
-            self._conn = HTTPSConnection(self.host, self.port)
-
+        if self.use_proxy:
+            self._proxy_connect()
         else:
-            msg = "Establishing unencrypted connection to %s:%s\n" % (
-                self.host, self.port
-            )
-            self._debug(msg)
-            self._conn = HTTPConnection(self.host, self.port)
+            self._connect()
 
     def execute(self, uri, method, args = None):
         """
