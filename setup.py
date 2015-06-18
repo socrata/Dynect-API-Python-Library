@@ -5,14 +5,14 @@ from distutils.core import setup
 version = '0.4'
 
 setup(
-    name="DynectDNS",
+    name="DynectDNS-proxy",
     version=version,
     keywords=["dynect", "api", "dns"],
     long_description=open(os.path.join(os.path.dirname(__file__),"README.md"), "r").read(),
-    description="Dynect REST API wrapper",
+    description="Dynect REST API wrapper with proxy support",
     author="Cole Tuininga",
     author_email="ctuininga@dyn.com",
-    url="https://github.com/dyninc/Dynect-API-Python-Library",
+    url="https://github.com/socrata/Dynect-API-Python-Library",
     packages=['dynect'],
     classifiers=[
         'Programming Language :: Python :: 2',
