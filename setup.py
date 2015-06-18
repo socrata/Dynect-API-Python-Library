@@ -2,7 +2,7 @@ import os
 from distutils.core import setup
 
 # sync with __init__.py
-version = '0.4'
+version = '0.5'
 
 setup(
     name="DynectDNS-proxy",
