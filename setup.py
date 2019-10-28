@@ -2,7 +2,7 @@ import os
 from distutils.core import setup
 
 # sync with __init__.py
-version = '0.4'
+version = '0.5'
 
 setup(
     name="DynectDNS",
@@ -18,6 +18,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: Name Service (DNS)',
-        'Topic :: Software Development :: Libraries', 
+        'Topic :: Software Development :: Libraries',
     ],
 )
